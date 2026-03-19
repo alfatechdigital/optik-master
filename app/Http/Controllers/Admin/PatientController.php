@@ -44,6 +44,7 @@ class PatientController extends Controller
             'tanggal_lahir'    => 'nullable|date|before:today',
             'jenis_kelamin'    => 'nullable|in:L,P',
             'no_hp'            => 'nullable|string|max:20',
+            'no_bpjs'          => 'nullable|string',
             'email'            => 'nullable|email|max:100',
             'alamat'           => 'nullable|string',
             'riwayat_penyakit' => 'nullable|string',
