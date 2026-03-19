@@ -376,15 +376,21 @@ function setBayar(val) {
     updateTotal();
 }
 function setBayarPas() {
-    const items       = Object.values(cart);
-    const subtotal    = items.reduce((s, i) => s + (i.harga_satuan * i.qty), 0);
-    const diskonP     = parseFloat(document.getElementById('diskon-persen').value) || 0;
-    let   diskonNom   = parseFloat(document.getElementById('diskon-nominal').value) || 0;
-    if (diskonP > 0) diskonNom = Math.round(subtotal * diskonP / 100);
-    const potonganBpjs = parseFloat(document.getElementById('potongan-bpjs').value) || 0;
-    document.getElementById('bayar-input').value = Math.max(0, subtotal - diskonNom - potonganBpjs);
+    const items    = Object.values(cart);
+    const subtotal = items.reduce((s, i) => s + (i.harga_satuan * i.qty), 0);
+
+    const diskonP  = parseFloat(document.getElementById('diskon-persen').value) || 0;
+    let diskonNom  = parseAngka(document.getElementById('diskon-nominal').value);
+    if (diskonP > 0) {
+        diskonNom = Math.round(subtotal * diskonP / 100);
+    }
+    const potonganBpjs = parseAngka(document.getElementById('potongan-bpjs').value);
+
+    const total = Math.max(0, subtotal - diskonNom - potonganBpjs);
+
     const input = document.getElementById('bayar-input');
     input.value = formatRibuan(total);
+
     updateTotal();
 }
 
