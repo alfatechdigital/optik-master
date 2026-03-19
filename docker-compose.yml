@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+
+  # Aplikasi Laravel
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: optik_app
+    restart: unless-stopped
+    ports:
+      - "8100:80"        # Akses lewat http://SERVER_IP:8100
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+    volumes:
+      - .env:/var/www/optik/.env
+      - storage_data:/var/www/optik/storage/app/public
+      - logs_data:/var/www/optik/storage/logs
+    depends_on:
+      - db
+    networks:
+      - optik_network
+
+  # Database MySQL
+  db:
+    image: mysql:8.0
+    container_name: optik_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: optik_store
+      MYSQL_USER: optik_user
+      MYSQL_PASSWORD: optik_password_123
+      MYSQL_ROOT_PASSWORD: root_password_123
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - optik_network
+    # Tidak expose port ke luar — hanya bisa diakses dari container app
+    # Kalau mau akses dari host untuk debugging, uncomment baris di bawah:
+    # ports:
+    #   - "3307:3306"
+
+volumes:
+  db_data:
+  storage_data:
+  logs_data:
+
+networks:
+  optik_network:
+    driver: bridge
