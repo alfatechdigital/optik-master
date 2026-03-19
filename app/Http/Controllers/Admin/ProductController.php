@@ -5,7 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\{Product, Category};
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use App\Exports\ProductExport;
+use App\Imports\ProductImport;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\HeadingRowImport;
 
 class ProductController extends Controller
 {
@@ -121,5 +127,95 @@ class ProductController extends Controller
         $product->delete();
         return redirect()->route('products.index')
             ->with('success', 'Produk berhasil dihapus.');
+    }
+
+    public function export()
+    {
+        return Excel::download(new ProductExport, 'products_' . now()->format('Y-m-d_H-i-s') . '.xlsx');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:2048',
+        ]);
+
+        $file = $request->file('file');
+
+        $headerError = $this->validateImportHeaders($file, ProductImport::expectedHeadings());
+        if ($headerError) {
+            return redirect()->route('products.index')
+                ->with('error', $headerError);
+        }
+
+        $import = new ProductImport;
+
+        try {
+            DB::beginTransaction();
+
+            Excel::import($import, $file);
+
+            $errors = $import->getErrors();
+            if (!empty($errors)) {
+                DB::rollBack();
+
+                $message = 'Import gagal: data tidak valid pada beberapa baris. ';
+                $message .= implode(' | ', array_slice($errors, 0, 5));
+                if (count($errors) > 5) {
+                    $message .= ' (+' . (count($errors) - 5) . ' lainnya)';
+                }
+
+                return redirect()->route('products.index')
+                    ->with('error', $message);
+            }
+
+            DB::commit();
+
+            $successCount = $import->getSuccessCount();
+            $message = "Import selesai. {$successCount} data berhasil diimpor.";
+
+            return redirect()->route('products.index')
+                ->with('success', $message);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return redirect()->route('products.index')
+                ->with('error', 'Import gagal: ' . $e->getMessage());
+        }
+    }
+
+    private function validateImportHeaders($file, array $expectedHeaders): ?string
+    {
+        $rows = (new HeadingRowImport)->toArray($file);
+        $headers = $rows[0][0] ?? [];
+
+        if (!is_array($headers) || empty($headers)) {
+            return 'Format file tidak valid: tidak dapat membaca baris header.';
+        }
+
+        $normalize = fn ($value) => Str::of($value)
+            ->trim()
+            ->lower()
+            ->replaceMatches('/\s+/', '_')
+            ->replace('-', '_')
+            ->__toString();
+
+        $normalized = array_map($normalize, $headers);
+        $expectedNormalized = array_map($normalize, $expectedHeaders);
+
+        $missing = array_diff($expectedNormalized, $normalized);
+        $extra = array_diff($normalized, $expectedNormalized);
+
+        if (!empty($missing) || !empty($extra)) {
+            $msgParts = [];
+            if (!empty($missing)) {
+                $msgParts[] = 'Kolom hilang: ' . implode(', ', $missing);
+            }
+            if (!empty($extra)) {
+                $msgParts[] = 'Kolom tidak diharapkan: ' . implode(', ', $extra);
+            }
+            return 'Template file tidak sesuai. ' . implode(' ', $msgParts) . ' Pastikan menggunakan template import yang benar.';
+        }
+
+        return null;
     }
 }
