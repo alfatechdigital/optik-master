@@ -98,6 +98,11 @@ class TransactionController extends Controller
             $totalBayar = $totalHarga - $diskonNominal;
             $kembalian  = $request->bayar - $totalBayar;
 
+            // Double Protection
+            if ($request->bayar < $totalBayar) {
+                throw new \Exception('Jumlah bayar kurang dari total yang harus dibayar.');
+            }
+
             $transaction = Transaction::create([
                 'no_transaksi'      => Transaction::generateNomor(),
                 'patient_id'        => $request->patient_id ?: null,

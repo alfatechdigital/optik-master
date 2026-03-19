@@ -163,6 +163,9 @@
                                class="form-control form-control-lg fw-bold"
                                min="0" value="0" required>
                     </div>
+                    <div class="invalid-feedback">
+                        Jumlah bayar kurang dari total!
+                    </div>
                 </div>
                 {{-- Nominal cepat --}}
                 <div class="d-flex flex-wrap gap-1 mb-3">
@@ -338,6 +341,19 @@ function updateTotal() {
     document.getElementById('total-display').textContent  = 'Rp ' + formatNum(total);
     document.getElementById('kembalian-display').textContent = 'Rp ' + formatNum(Math.max(0, kembalian));
     document.getElementById('kembalian-display').style.color = kembalian < 0 ? '#dc3545' : '#16a34a';
+
+    const bayarInput = document.getElementById('bayar-input');
+    const btnBayar   = document.getElementById('btn-bayar');
+    
+    bayarInput.classList.remove('is-invalid');
+
+    if (bayar < total) {
+        bayarInput.classList.add('is-invalid');
+        btnBayar.disabled = true;
+    } else {
+        bayarInput.classList.remove('is-invalid');
+        btnBayar.disabled = false;
+    }
 }
 
 document.getElementById('diskon-persen').addEventListener('input', updateTotal);

@@ -31,7 +31,7 @@
                 @forelse($transactions as $trx)
                 <tr>
                     <td class="ps-3 fw-semibold">{{ $trx->no_transaksi }}</td>
-                    <td>{{ $trx->patient->nama ?? '<span class="text-muted small">Umum</span>' }}</td>
+                    <td>{!! $trx->patient->nama ?? '<span class="text-muted small">Umum</span>' !!}</td>
                     <td>{{ $trx->kasir->name ?? '-' }}</td>
                     <td>Rp {{ number_format($trx->total_bayar,0,',','.') }}</td>
                     <td><span class="badge bg-light text-dark border">{{ ucfirst($trx->metode_bayar) }}</span></td>
