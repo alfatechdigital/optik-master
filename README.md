@@ -118,23 +118,23 @@ http://localhost:8000
 ## 🌿 Branch Structure
 
 * `main` → production (stabil)
-* `dev` → development (tempat kerja)
+* `develop` → development (tempat kerja)
 * `feature/*` → fitur per developer
 
 ---
 
 ## 🧑‍💻 Cara Mulai Kerja
 
-### 1. Pindah ke branch dev
+### 1. Pindah ke branch develop
 
 ```bash
-git checkout dev
+git checkout develop
 ```
 
 ### 2. Ambil update terbaru
 
 ```bash
-git pull origin dev
+git pull origin develop
 ```
 
 ### 3. Buat branch fitur (opsional tapi disarankan)
@@ -167,10 +167,10 @@ Jika pakai branch fitur:
 git push origin feature/nama-fitur
 ```
 
-Jika langsung ke dev:
+Jika langsung ke develop:
 
 ```bash
-git push origin dev
+git push origin develop
 ```
 
 ---
@@ -178,7 +178,7 @@ git push origin dev
 ## 🔁 Update Code dari Tim
 
 ```bash
-git pull origin dev
+git pull origin develop
 ```
 
 ---
@@ -190,7 +190,7 @@ Jika fitur sudah selesai dan stabil:
 ```bash
 git checkout main
 git pull origin main
-git merge dev
+git merge develop
 git push origin main
 ```
 
