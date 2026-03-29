@@ -52,9 +52,9 @@ class TransactionController extends Controller
     {
         // Normalize string to numeric input
         $request->merge([
-            'bayar' => (int)str_replace('.', '', $request->bayar),
-            'diskon_nominal' => (int)str_replace('.', '', $request->diskon_nominal),
-            'potongan_bpjs' => (int)str_replace('.', '', $request->potongan_bpjs),
+            'bayar' => (int) str_replace('.', '', $request->bayar),
+            'diskon_nominal' => (int) str_replace('.', '', $request->diskon_nominal),
+            'potongan_bpjs' => (int) str_replace('.', '', $request->potongan_bpjs),
         ]);
 
         $request->validate([
@@ -168,10 +168,10 @@ class TransactionController extends Controller
         $products = Product::where('is_active', true)
             ->where('stok', '>', 0)
             ->where(function ($q) use ($request) {
-            $q->where('nama', 'like', "%{$request->q}%")
-                ->orWhere('kode_produk', 'like', "%{$request->q}%")
-                ->orWhere('merek', 'like', "%{$request->q}%");
-        })
+                $q->where('nama', 'like', "%{$request->q}%")
+                    ->orWhere('kode_produk', 'like', "%{$request->q}%")
+                    ->orWhere('merek', 'like', "%{$request->q}%");
+            })
             ->with('category')
             ->limit(10)
             ->get(['id', 'kode_produk', 'nama', 'merek', 'harga_jual', 'stok', 'category_id']);
@@ -191,13 +191,13 @@ class TransactionController extends Controller
             ->take(10)
             ->get(['id', 'tanggal_kunjungan', 'od_sph', 'os_sph'])
             ->map(function ($r) {
-            return [
-            'id' => $r->id,
-            'tanggal_kunjungan' => $r->tanggal_kunjungan->format('d M Y'),
-            'od_sph' => $r->od_sph ?? '-',
-            'os_sph' => $r->os_sph ?? '-',
-            ];
-        });
+                return [
+                    'id' => $r->id,
+                    'tanggal_kunjungan' => $r->tanggal_kunjungan->format('d M Y'),
+                    'od_sph' => $r->od_sph ?? '-',
+                    'os_sph' => $r->os_sph ?? '-',
+                ];
+            });
 
         return response()->json($records);
     }
@@ -230,16 +230,16 @@ class TransactionController extends Controller
     {
         $q = $request->q;
         $query = Transaction::with('patient')->latest()->take(20);
-        
+
         if ($q) {
             $query->where('no_transaksi', 'like', "%{$q}%")
-                  ->orWhereHas('patient', function($p) use ($q) {
-                      $p->where('nama', 'like', "%{$q}%")
+                ->orWhereHas('patient', function ($p) use ($q) {
+                    $p->where('nama', 'like', "%{$q}%")
                         ->orWhere('no_bpjs', 'like', "%{$q}%");
-                  });
+                });
         }
-        
-        $transactions = $query->get()->map(function($t) {
+
+        $transactions = $query->get()->map(function ($t) {
             return [
                 'id' => $t->id,
                 'no_transaksi' => $t->no_transaksi,
@@ -256,14 +256,14 @@ class TransactionController extends Controller
     {
         // Remove dots from currency
         $request->merge([
-            'harga_jual' => (int)str_replace('.', '', $request->harga_jual),
-            'dp' => (int)str_replace('.', '', $request->dp),
-            'potongan' => (int)str_replace('.', '', $request->potongan),
+            'harga_jual' => (int) str_replace('.', '', $request->harga_jual),
+            'dp' => (int) str_replace('.', '', $request->dp),
+            'potongan' => (int) str_replace('.', '', $request->potongan),
         ]);
 
         try {
             DB::beginTransaction();
-            
+
             // Handle Patient
             $patient = null;
             if ($request->patient_id) {
@@ -302,8 +302,8 @@ class TransactionController extends Controller
                 'patient_id' => $patient ? $patient->id : null,
                 'user_id' => auth()->id(),
                 'status' => 'lunas',
-                'metode_bayar' => 'tunai', 
-                
+                'metode_bayar' => 'tunai',
+
                 // Fields
                 'tgl_order' => $request->tgl_order ?? date('Y-m-d'),
                 'no_legalisasi' => $request->no_legalisasi,
@@ -315,16 +315,24 @@ class TransactionController extends Controller
                 'tgl_selesai_faset' => $request->tgl_selesai_faset,
                 'tgl_selesai_janji' => $request->tgl_selesai_janji,
                 'catatan' => $request->catatan,
-                
-                'od_sph' => $request->od_sph, 'od_cyl' => $request->od_cyl, 'od_axis' => $request->od_axis, 'od_add' => $request->od_add, 'od_mpd' => $request->od_mpd,
-                'os_sph' => $request->os_sph, 'os_cyl' => $request->os_cyl, 'os_axis' => $request->os_axis, 'os_add' => $request->os_add, 'os_mpd' => $request->os_mpd,
-                
+
+                'od_sph' => $request->od_sph,
+                'od_cyl' => $request->od_cyl,
+                'od_axis' => $request->od_axis,
+                'od_add' => $request->od_add,
+                'od_mpd' => $request->od_mpd,
+                'os_sph' => $request->os_sph,
+                'os_cyl' => $request->os_cyl,
+                'os_axis' => $request->os_axis,
+                'os_add' => $request->os_add,
+                'os_mpd' => $request->os_mpd,
+
                 'no_bpjs' => $request->no_bpjs,
                 'nama_pasien' => $request->nama,
                 'alamat_pasien' => $request->alamat,
                 'telp_pasien' => $request->telp,
                 'asal_resep' => $request->asal_resep,
-                
+
                 'lensa' => $request->lensa,
                 'kode_frame' => $kodeFrame,
                 'nama_produk' => $namaProduk,
@@ -333,7 +341,7 @@ class TransactionController extends Controller
                 'warna' => $warna,
                 'typefaktur' => $request->typefaktur,
                 'diambil' => $request->diambil,
-                
+
                 // Money
                 'harga_jual' => $request->harga_jual,
                 'dp' => $request->dp,
@@ -365,7 +373,8 @@ class TransactionController extends Controller
             $cartData = json_decode($request->cart_data, true) ?: [];
             if (is_array($cartData) && count($cartData) > 0) {
                 foreach ($cartData as $item) {
-                    if (empty($item['kode'])) continue;
+                    if (empty($item['kode']))
+                        continue;
                     $product = Product::where('kode_produk', $item['kode'])->first();
                     $trx->items()->create([
                         'product_id' => $product ? $product->id : null,
@@ -378,7 +387,8 @@ class TransactionController extends Controller
             } else {
                 $kodeFrames = is_array($request->kode_frame) ? $request->kode_frame : [$request->kode_frame];
                 foreach ($kodeFrames as $idx => $kode) {
-                    if (!$kode) continue;
+                    if (!$kode)
+                        continue;
                     $product = Product::where('kode_produk', $kode)->first();
                     $trx->items()->create([
                         'product_id' => $product->id,
@@ -403,7 +413,7 @@ class TransactionController extends Controller
         try {
             $trx = Transaction::findOrFail($id);
             if ($trx->items()->count() > 0) {
-               $trx->items()->delete();
+                $trx->items()->delete();
             }
             $trx->delete();
             return response()->json(['status' => 'success']);
@@ -416,9 +426,9 @@ class TransactionController extends Controller
     {
         $q = $request->q;
         $patients = Patient::where('no_bpjs', 'like', "%{$q}%")
-                    ->orWhere('nama', 'like', "%{$q}%")
-                    ->orWhere('no_hp', 'like', "%{$q}%")
-                    ->take(10)->get();
+            ->orWhere('nama', 'like', "%{$q}%")
+            ->orWhere('no_hp', 'like', "%{$q}%")
+            ->take(10)->get();
         return response()->json($patients);
     }
 
@@ -426,9 +436,9 @@ class TransactionController extends Controller
     {
         $q = $request->q;
         $products = Product::where('kode_produk', 'like', "%{$q}%")
-                    ->orWhere('nama', 'like', "%{$q}%")
-                    ->orWhere('merek', 'like', "%{$q}%")
-                    ->take(10)->get();
+            ->orWhere('nama', 'like', "%{$q}%")
+            ->orWhere('merek', 'like', "%{$q}%")
+            ->take(10)->get();
         return response()->json($products);
     }
 }
