@@ -20,8 +20,8 @@ class Transaction extends Model
     public static function generateNomor(): string
     {
         $prefix = 'TRX' . date('Ymd');
-        $last   = static::where('no_transaksi', 'like', $prefix . '%')->latest('id')->first();
-        $num    = $last ? ((int) substr($last->no_transaksi, -4)) + 1 : 1;
+        $last = static::where('no_transaksi', 'like', $prefix . '%')->latest('id')->first();
+        $num = $last ? ((int)substr($last->no_transaksi, -4)) + 1 : 1;
         return $prefix . str_pad($num, 4, '0', STR_PAD_LEFT);
     }
 
@@ -33,7 +33,7 @@ class Transaction extends Model
 
     public function kasir()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class , 'user_id');
     }
 
     public function medicalRecord()
