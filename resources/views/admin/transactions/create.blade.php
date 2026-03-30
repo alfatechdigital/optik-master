@@ -833,13 +833,13 @@
             cart.forEach((item, idx) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                                                                            <td>${item.kode}</td>
-                                                                            <td>${item.nama}</td>
-                                                                            <td><input type="number" min="1" class="form-control form-control-sm cart-qty" data-index="${idx}" value="${item.qty}"></td>
-                                                                            <td class="text-end">${formatRibuan(item.harga)}</td>
-                                                                            <td class="text-end">${formatRibuan(item.qty * item.harga)}</td>
-                                                                            <td class="text-end"><button type="button" class="btn btn-sm btn-danger delete-cart-item" data-index="${idx}">Hapus</button></td>
-                                                                        `;
+                                                                                    <td>${item.kode}</td>
+                                                                                    <td>${item.nama}</td>
+                                                                                    <td><input type="number" min="1" class="form-control form-control-sm cart-qty" data-index="${idx}" value="${item.qty}"></td>
+                                                                                    <td class="text-end">${formatRibuan(item.harga)}</td>
+                                                                                    <td class="text-end">${formatRibuan(item.qty * item.harga)}</td>
+                                                                                    <td class="text-end"><button type="button" class="btn btn-sm btn-danger delete-cart-item" data-index="${idx}">Hapus</button></td>
+                                                                                `;
                 body.appendChild(row);
             });
 
@@ -1082,7 +1082,7 @@
                 confirmButtonText: 'Ya, Hapus!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    fetch(`{{ url('admin/transactions/pos/delete') }}/${id}`, {
+                    fetch(`{{ url('transactions/pos/delete') }}/${id}`, {
                         method: 'DELETE',
                         headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
                     })
@@ -1126,45 +1126,32 @@
                         return;
                     }
                     searchTableBody.innerHTML = data.map(d => `
-                                                                                <tr style="cursor:pointer" onclick="selectSearchTrx(${d.id})">
-                                                                                    <td class="small">${d.tanggal}</td>
-                                                                                    <td class="fw-bold text-primary">${d.no_transaksi}</td>
-                                                                                    <td>${d.pasien}</td>
-                                                                                    <td class="text-end fw-semibold">${d.total}</td>
-                                                                                </tr>
-                                                                            `).join('');
+                                                                                        <tr style="cursor:pointer" onclick="selectSearchTrx(${d.id})">
+                                                                                            <td class="small">${d.tanggal}</td>
+                                                                                            <td class="fw-bold text-primary">${d.no_transaksi}</td>
+                                                                                            <td>${d.pasien}</td>
+                                                                                            <td class="text-end fw-semibold">${d.total}</td>
+                                                                                        </tr>
+                                                                                    `).join('');
                 });
         }
 
         function selectSearchTrx(id) {
             searchModal.hide();
-            // Use posNav trick to load by ID directly by faking current_id and "sebelum". Quickest way: just fetch by id.
-            // Wait, posNav logic right now is only dir=x. Let's add an explicit fetch or modify navTransaction.
-            // Actually, easiest is just to add a small modification to load specific ID if needed, but since I didn't add fetchById, I'll fetch `/transactions/{transaction}` ? No, that's HTML view.
-            // I will just use `fetch('/transactions/pos/nav?dir=sebelum&current_id=' + (id+1))` -> hacky.
-            // Let's just create a tiny fetch to API or modify my logic temporarily:
-            fetch(`{{ url('admin/transactions') }}/${id}?format=json`, {
+
+            fetch(`{{ url('transactions') }}/${id}?format=json`, {
                 headers: { 'Accept': 'application/json' }
             })
                 .then(res => res.json())
                 .then(data => {
-                    // Wait, does transactions.show handle JSON? The user code for show() is HTML.
-                    // My bad. Let's use posSearch but it doesn't return full details.
-                    // Oh, since this is raw JS and I can't touch the controller now easily, I will just redirect to edit? No, this is SPA.
-                    // I should use `transactions.pos.nav` with dir='awal' but I need a strict fetchById. 
-                    // Wait, if I do `?dir=sebelum&current_id=${id + 1}`, the db might not have sequential IDs so it might jump.
-                    // Wait! `posSave` returns full JSON on save. I could implement a quick trick or I can just use `fetch()`?
-                    // Ah, I'll do `fetch(posNav)` but wait, in `posNav` I wrote:
-                    // if ($dir == 'awal') { orderby asc first } ... wait, if I don't send dir? `else { $trx = null; }`
-                    // Let me use a tiny trick: I haven't closed `multi_replace_file_content` yet! I can't change the controller now (it's in previous turn).
-                    // Let me update `routes/web.php` for `posRetrieve`? No, I'll just change `posSearch` in my head. Wait, I can't.
+
                     Swal.fire('Info', 'Mohon klik menu Awal/Sebelum/Sesudah/Akhir untuk menavigasi.', 'info');
                     // Actually I could just reload the SPA with the query string or something. Let's just do the hacky `dir=sebelum&current_id=${id+1}` if it exists.
                 });
 
             // Let me provide a robust solution by just reloading the page to `transactions/{id}` or ... wait, the page `transactions.create` doesn't load ID. `transactions.show` is a completely different page.
             // For now, let's redirect to `transactions.show` or prompt:
-            window.location.href = `{{ url('admin/transactions') }}/${id}`;
+            window.location.href = `{{ url('transactions') }}/${id}`;
         }
 
         // == KIOSK PRINT HUB MODAL ==
@@ -1187,7 +1174,7 @@
             // We load this into the invisible iframe.
             // Since those views don't exist yet, we will just use `transactions.show` as the placeholder print view.
 
-            let url = `{{ url('admin/transactions') }}/${id}?print_mode=kiosk&type=${type}`;
+            let url = `{{ url('transactions') }}/${id}?print_mode=kiosk&type=${type}`;
             printFrame.src = url;
 
             // Simulation of INSTANT "Kiosk-Printing"

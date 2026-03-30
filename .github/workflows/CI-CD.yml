@@ -1,0 +1,20 @@
+name: Latihan CI CD Alfatech
+on: [push] 
+
+jobs:
+  cek-kualitas-kode:
+    runs-on: ubuntu-latest 
+    steps:
+      - name: Ambil Kode dari Repo
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+
+      - name: Install Library (Composer)
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Jalankan Unit Test
+        run: php artisan test 
