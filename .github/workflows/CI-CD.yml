@@ -17,9 +17,6 @@ jobs:
       - name: Install Library (Composer)
         run: composer install --no-interaction --prefer-dist
 
-      - name: Copy Environment File
-        run: cp .env.example .env
-
       - name: Prepare Laravel Environment
         run: |
           cp .env.example .env
