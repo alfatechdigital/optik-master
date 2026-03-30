@@ -561,13 +561,13 @@
                 <div class="card glass-card p-3 shadow-lg border-primary border-opacity-25 bg-white bg-opacity-75">
                     <div class="d-flex flex-wrap justify-content-center gap-2">
                         <button type="button" class="btn btn-action btn-light border shadow-sm"
-                            onclick="navTransaction('awal')"><i class="bi bi-chevron-bar-left"></i> Awal</button>
+                            onclick="navTransaction('awal')"><i class="bi bi-chevron-bar-left"></i> </button>
                         <button type="button" class="btn btn-action btn-light border shadow-sm"
                             onclick="navTransaction('sebelum')"><i class="bi bi-chevron-left"></i></button>
                         <button type="button" class="btn btn-action btn-light border shadow-sm"
                             onclick="navTransaction('sesudah')"><i class="bi bi-chevron-right"></i></button>
                         <button type="button" class="btn btn-action btn-light border shadow-sm"
-                            onclick="navTransaction('akhir')"><i class="bi bi-chevron-bar-right"></i> Akhir</button>
+                            onclick="navTransaction('akhir')"><i class="bi bi-chevron-bar-right"></i> </button>
 
                         <div class="vr mx-2 text-muted opacity-25"></div>
 

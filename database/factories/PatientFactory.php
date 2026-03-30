@@ -23,6 +23,7 @@ class PatientFactory extends Factory
             'tanggal_lahir' => $this->faker->date(),
             'jenis_kelamin' => $this->faker->randomElement(['L', 'P']),
             'no_hp' => $this->faker->phoneNumber(),
+            'no_bpjs' => '000' . $this->faker->unique()->numerify('#####'),
             'email' => $this->faker->safeEmail(),
             'alamat' => $this->faker->address(),
             'riwayat_penyakit' => $this->faker->sentence(10),
