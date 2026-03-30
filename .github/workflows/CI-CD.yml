@@ -1,4 +1,4 @@
-name: Latihan CI CD Alfatech
+name: Workflow CI/CD Laravel
 on: [push] 
 
 jobs:
