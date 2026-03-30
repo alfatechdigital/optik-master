@@ -8,6 +8,7 @@ jobs:
       - name: Ambil Kode dari Repo
         uses: actions/checkout@v4
 
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -16,6 +17,18 @@ jobs:
       - name: Install Library (Composer)
         run: composer install --no-interaction --prefer-dist
 
-      - name: Jalankan Unit Test
-        run: php artisan test 
+      - name: Copy Environment File
+        run: cp .env.example .env
+
+      - name: Prepare Laravel Environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          touch database/database.sqlite # Buat file database kosong
+
+      - name: Run Tests
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+        run: php artisan test
         
